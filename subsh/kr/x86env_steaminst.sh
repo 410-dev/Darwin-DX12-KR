@@ -38,15 +38,6 @@ if [[ "$(arch)" != "i386" ]]; then
 fi
 echo -e "${GREEN}구현 환경 아키텍처는 i386 입니다.${NC}"
 
-# # Parameter 확인
-# if [[ -z "$1" ]]; then
-#     echo -e "${RED}오류: 스크립트 실행 조건을 만족하지 않습니다. (파라미터 불일치)${NC}"
-#     exit 1
-# elif [[ ! -d "$1/lib" ]]; then
-#     echo -e "${RED}오류: 스크립트 실행 조건을 만족하지 않습니다. (파라미터 무효)${NC}"
-#     exit 1
-# fi
-
 echo "시스템 적합성 검사를 완료했습니다."
 
 echo "Steam for Windows x86_64 를 설치 단계를 시작합니다..."
