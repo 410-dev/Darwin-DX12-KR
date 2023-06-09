@@ -8,7 +8,7 @@
 
 ### 사용 방법 (git 사용 없이)
 
-이 링크에서 d3d12script.tar.gz 파일을 다운로드 받고, 압축을 해제합니다.
+[이 링크](https://github.com/410-dev/Darwin-DX12-KR/releases/) 에서 [d3d12script.tar.gz](https://github.com/410-dev/Darwin-DX12-KR/releases/download/0.0.1/d3d12script.tar.gz) 파일을 다운로드 받고, 압축을 해제합니다.
 
 터미널을 열고 다음 명령어를 입력합니다. 이 때, <압축 해제된 폴더 이름> 은 압축 해제된 폴더 이름으로 바꾸어주세요.
 
