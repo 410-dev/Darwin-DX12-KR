@@ -45,6 +45,7 @@ Then follow the instructions of the script.
 
 
 <hr>
+  
 # macOS Direct3D 12 Installer
 
 이 스크립트는 macOS 14 Sonoma 에서 발표된 Game Porting Toolkit 을 이용해 Rosetta 2 위에서 DirectX11, 12 를 필요로 하는 Windows 용 게임들을 구동시킬 수 있도록 하는데 필요한 작업들을 일괄로 처리할 수 있도록 만든 스크립트입니다.
