@@ -17,7 +17,7 @@ XCODE_CMDL_MOUNT_POINT="/tmp/d3d12_xcode"
 
 echo "#######Script Release#######"
 echo "Script Written: 2023-June-09 EDT"
-echo "Script Updated: 2023-June-09 EDT"
+echo "Script Updated: 2023-June-17 EDT"
 echo "macOS Version: macOS 14.0 Developer Beta 1"
 echo "############################"
 echo ""
