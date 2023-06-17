@@ -8,6 +8,15 @@ This script is about 90% automated, and the rest requires direct mouse operation
 
 <br>
 
+### Supported
+✅: Supported
+⚠️: Working in progress / Not tested
+❌: Not supported
+- [✅] Steam
+- [⚠️] [W.I.P] Battle.net
+- [⚠️] [W.I.P] Epic Games
+- [⚠️] [W.I.P] GOG.com
+
 ### How to use (without git)
 
 Download the [d3d12script.tar.gz](https://github.com/410-dev/Darwin-DirectX12/releases/download/0.0.1/d3d12script.tar.gz) file from [this link (releases page)](https://github.com/410-dev/Darwin-DirectX12/releases), and extract it.
@@ -52,6 +61,15 @@ Then follow the instructions of the script.
 이 스크립트는 약 90% 가량 자동화 되어있으며 나머지는 직접적인 마우스 조작이 필요합니다.
 
 <br>
+
+### 지원 여부
+✅: 지원됨
+⚠️: 작업중 / 테스트 안됨
+❌: 지원 안됨
+- [✅] Steam
+- [⚠️] [작업중] Battle.net
+- [⚠️] [작업중] Epic Games
+- [⚠️] [작업중] GOG.com
 
 ### 사용 방법 (git 사용 없이)
 
