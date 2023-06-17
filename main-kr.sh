@@ -17,7 +17,7 @@ XCODE_CMDL_MOUNT_POINT="/tmp/d3d12_xcode"
 
 echo "#######Script Release#######"
 echo "Script Written: 2023-June-09 EDT"
-echo "Script Updated: 2023-June-09 EDT"
+echo "Script Updated: 2023-June-17 EDT"
 echo "macOS Version: macOS 14.0 Developer Beta 1"
 echo "############################"
 echo ""
@@ -28,6 +28,11 @@ echo ""
 echo "D3D12 에뮬레이션 환경 설치 준비 단계를 시작합니다..."
 echo "시스템 적합성을 검사합니다..."
 
+# If argument contains "--skip-version-check" then skip version check by adding environment variable
+if [[ "$*" == *--skip-version-check* ]]; then
+    export SKIP_VERSION_CHECK="1"
+fi
+
 # Darwin 커널 확인
 if [[ "$OSTYPE" != "darwin"* ]]; then
     echo -e "${RED}오류: 스크립트를 실행할 수 없습니다. (커널 유형 불일치)${NC}"
@@ -36,22 +41,26 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
 fi
 echo -e "${GREEN}시스템 커널은 Darwin 입니다.${NC}"
 
-# 커널 버전 확인
-if [[ "$OSTYPE" != "darwin23"* ]]; then
-    echo -e "${RED}오류: 스크립트를 실행할 수 없습니다. (커널 버전 불일치)${NC}"
-    echo -e "${RED}macOS 14.0 Developer Beta 1 이상에서 실행해 주세요.${NC}"
-    exit 1
-fi
-echo -e "${GREEN}시스템 커널 버전은 23.x 입니다.${NC}"
+if [[ -z "$SKIP_VERSION_CHECK" ]]; then
+    # 커널 버전 확인
+    if [[ "$OSTYPE" != "darwin23"* ]]; then
+        echo -e "${RED}오류: 스크립트를 실행할 수 없습니다. (커널 버전 불일치)${NC}"
+        echo -e "${RED}macOS 14.0 Developer Beta 1 이상에서 실행해 주세요.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}시스템 커널 버전은 23.x 입니다.${NC}"
 
-# Production 버전 확인  
-OSVER=$(sw_vers -productVersion)
-if [[ -z "$(echo "$OSVER" | grep "14.")" ]]; then
-    echo -e "${RED}오류: 스크립트를 실행할 수 없습니다. (Production 버전 불일치)${NC}"
-    echo -e "${RED}macOS 14.0 Developer Beta 1 이상에서 실행해 주세요.${NC}"
-    exit 1
+    # Production 버전 확인  
+    OSVER=$(sw_vers -productVersion)
+    if [[ -z "$(echo "$OSVER" | grep "14.")" ]]; then
+        echo -e "${RED}오류: 스크립트를 실행할 수 없습니다. (Production 버전 불일치)${NC}"
+        echo -e "${RED}macOS 14.0 Developer Beta 1 이상에서 실행해 주세요.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}시스템 프러덕션 버전은 14.x 입니다.${NC}"
+else
+    echo -e "${YELLOW}버전 검사를 건너뜁니다.${NC}"
 fi
-echo -e "${GREEN}시스템 프러덕션 버전은 14.x 입니다.${NC}"
 
 # 아키텍쳐 확인
 if [[ "$(arch)" != "arm64" ]]; then
