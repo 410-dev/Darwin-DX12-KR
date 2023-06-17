@@ -28,6 +28,11 @@ echo ""
 echo "Starting the preparation stage for D3D12 emulation environment installation..."
 echo "Checking system compatibility..."
 
+# If argument contains "--skip-version-check" then skip version check by adding environment variable
+if [[ "$*" == *--skip-version-check* ]]; then
+    export SKIP_VERSION_CHECK="1"
+fi
+
 # Check Darwin Kernel
 if [[ "$OSTYPE" != "darwin"* ]]; then
     echo -e "${RED}Error: The script cannot be executed. (Kernel type mismatch)${NC}"
@@ -36,22 +41,26 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
 fi
 echo -e "${GREEN}The system kernel is Darwin.${NC}"
 
-# Check Kernel Version
-if [[ "$OSTYPE" != "darwin23"* ]]; then
-    echo -e "${RED}Error: The script cannot be executed. (Kernel version mismatch)${NC}"
-    echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
-    exit 1
-fi
-echo -e "${GREEN}The system kernel version is 23.x.${NC}"
+if [[ -z "$SKIP_VERSION_CHECK" ]]; then
+    # Check Kernel Version
+    if [[ "$OSTYPE" != "darwin23"* ]]; then
+        echo -e "${RED}Error: The script cannot be executed. (Kernel version mismatch)${NC}"
+        echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}The system kernel version is 23.x.${NC}"
 
-# Check Production Version  
-OSVER=$(sw_vers -productVersion)
-if [[ -z "$(echo "$OSVER" | grep "14.")" ]]; then
-    echo -e "${RED}Error: The script cannot be executed. (Production version mismatch)${NC}"
-    echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
-    exit 1
+    # Check Production Version  
+    OSVER=$(sw_vers -productVersion)
+    if [[ -z "$(echo "$OSVER" | grep "14.")" ]]; then
+        echo -e "${RED}Error: The script cannot be executed. (Production version mismatch)${NC}"
+        echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}The system production version is 14.x.${NC}"
+else
+    echo -e "${YELLOW}Skipping version check.${NC}"
 fi
-echo -e "${GREEN}The system production version is 14.x.${NC}"
 
 # Check Architecture
 if [[ "$(arch)" != "arm64" ]]; then

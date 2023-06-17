@@ -14,22 +14,26 @@ if [[ "$OSTYPE" != "darwin"* ]]; then
 fi
 echo -e "${GREEN}System kernel is Darwin.${NC}"
 
-# Verify kernel version
-if [[ "$OSTYPE" != "darwin23"* ]]; then
-    echo -e "${RED}Error: Unable to run the script. (Kernel version mismatch)${NC}"
-    echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
-    exit 1
-fi
-echo -e "${GREEN}System kernel version is 23.x.${NC}"
+if [[ -z "$SKIP_VERSION_CHECK" ]]; then
+    # Check Kernel Version
+    if [[ "$OSTYPE" != "darwin23"* ]]; then
+        echo -e "${RED}Error: The script cannot be executed. (Kernel version mismatch)${NC}"
+        echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}The system kernel version is 23.x.${NC}"
 
-# Verify Production version  
-OSVER=$(sw_vers -productVersion)
-if [[ -z "$(echo "$OSVER" | grep "14.")" ]]; then
-    echo -e "${RED}Error: Unable to run the script. (Production version mismatch)${NC}"
-    echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
-    exit 1
+    # Check Production Version  
+    OSVER=$(sw_vers -productVersion)
+    if [[ -z "$(echo "$OSVER" | grep "14.")" ]]; then
+        echo -e "${RED}Error: The script cannot be executed. (Production version mismatch)${NC}"
+        echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
+        exit 1
+    fi
+    echo -e "${GREEN}The system production version is 14.x.${NC}"
+else
+    echo -e "${YELLOW}Skipping version check.${NC}"
 fi
-echo -e "${GREEN}System production version is 14.x.${NC}"
 
 # Check architecture
 if [[ "$(arch)" != "i386" ]]; then
