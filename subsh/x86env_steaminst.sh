@@ -43,22 +43,26 @@ echo -e "${GREEN}$WINSTEAM_INSTALL_SUCCESS${NC}"
 echo "$WINSTEAM_LOGIN_WINDOW_OPEN"
 echo -e "${YELLOW}$WINSTEAM_LOGIN_WINDOW_WARNING${NC}"
 echo "$WINSTEAM_LOGIN_WINDOW_CONTINUE"
-while true; do
-    MTL_HUD_ENABLED=1 WINEESYNC=1 WINEPREFIX=~/WindowsPrefix /usr/local/Cellar/game-porting-toolkit/1.0/bin/wine64 'C:\Program Files (x86)\Steam\steam.exe' >/dev/null 2>/dev/null 3>/dev/null
+MTL_HUD_ENABLED=1 WINEESYNC=1 WINEPREFIX=~/WindowsPrefix /usr/local/Cellar/game-porting-toolkit/1.0/bin/wine64 'C:\Program Files (x86)\Steam\steam.exe' >/dev/null 2>/dev/null 3>/dev/null
+while true; do    
     echo -e "${YELLOW}$WINSTEAM_LOGIN_WINDOW_CLOSED${NC}"
     echo "$WINSTEAM_LOGIN_WINDOW_SUCCESS_QUESTION"
     read -p "$WINSTEAM_LOGIN_WINDOW_SUCCESS_PROMPT" yn
-    case $yn in
-        [Yy]* ) break;;
-        [Nn]* ) continue;;
-        * ) echo "$YORNONLY";;
-    esac
-    echo "$ALL_WINE_SERVER_PRELOADERS_KILL"
-    if [[ -n "$(pgrep wineserver)" ]]; then
-        killall wineserver
-    fi
-    if [[ -n "$(pgrep wine64-preloader)" ]]; then
-        killall wine64-preloader
+
+    if [[ "$yn" == "Y" ]] || [[ "$yn" == "y" ]]; then
+        break
+    elif [[ "$yn" == "N" ]] || [[ "$yn" == "n" ]]; then
+        echo "$ALL_WINE_SERVER_PRELOADERS_KILL"
+        if [[ -n "$(pgrep wineserver)" ]]; then
+            killall wineserver
+        fi
+        if [[ -n "$(pgrep wine64-preloader)" ]]; then
+            killall wine64-preloader
+        fi
+        MTL_HUD_ENABLED=1 WINEESYNC=1 WINEPREFIX=~/WindowsPrefix /usr/local/Cellar/game-porting-toolkit/1.0/bin/wine64 'C:\Program Files (x86)\Steam\steam.exe' >/dev/null 2>/dev/null 3>/dev/null
+    else
+        echo -e "${RED}$YORNONLY${NC}"
+        continue
     fi
 done
 echo -e "${GREEN}$STEAM_LOGIN_DONE${NC}"
