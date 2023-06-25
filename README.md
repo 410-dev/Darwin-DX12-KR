@@ -79,14 +79,14 @@ Then follow the instructions of the script.
 
 ```bash
 cd ~/Downloads/<압축 해제된 폴더 이름>
-./main-kr.sh
+./main.sh --kr
 ```
 
 예:
 
 ```bash
 cd ~/Downloads/d3d12script
-./main-kr.sh
+./main.sh --kr
 ```
 
 이후 스크립트의 안내에 따르십시오.
@@ -100,7 +100,7 @@ cd ~/Downloads/d3d12script
 ```bash
 git clone https://github.com/410-dev/Darwin-DirectX12.git
 cd Darwin-DirectX12
-./main-kr.sh
+./main.sh --kr
 ```
 
 이후 스크립트의 안내에 따르십시오.

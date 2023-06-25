@@ -15,393 +15,370 @@ TOOLKIT_MOUNT_POINT="/tmp/d3d12_toolkit"
 XCODE_CMDL_PATH="Downloads/Command_Line_Tools_for_Xcode_15_beta.dmg"
 XCODE_CMDL_MOUNT_POINT="/tmp/d3d12_xcode"
 
+if [[ "$*" == *--kr* ]]; then
+    source langs/kr.env
+else
+    source langs/en.env
+fi
+
 echo "#######Script Release#######"
 echo "Script Written: 2023-June-09 EDT"
-echo "Script Updated: 2023-June-17 EDT"
-echo "macOS Version: macOS 14.0 Developer Beta 1"
+echo "Script Updated: 2023-June-24 EDT"
+echo "Tested on: macOS 14.0 Developer Beta 2"
 echo "############################"
 echo ""
-echo "This script is written based on the Game Porting Toolkit document of the Apple Gaming Wiki."
+echo "$SCRIPT_DOC_INFO"
 echo "https://www.applegamingwiki.com/wiki/Game_Porting_Toolkit"
 echo ""
 echo ""
-echo "Starting the preparation stage for D3D12 emulation environment installation..."
-echo "Checking system compatibility..."
+echo "$D3D12EMU_START"
+echo "$SYS_COMPAT_CHECK"
 
 # If argument contains "--skip-version-check" then skip version check by adding environment variable
 if [[ "$*" == *--skip-version-check* ]]; then
     export SKIP_VERSION_CHECK="1"
 fi
 
-# Check Darwin Kernel
-if [[ "$OSTYPE" != "darwin"* ]]; then
-    echo -e "${RED}Error: The script cannot be executed. (Kernel type mismatch)${NC}"
-    echo -e "${RED}Please run on macOS.${NC}"
+# Copy the compatibility check script to tmp
+cp subsh/compatchk.sh /tmp/compatchk.sh
+
+# Copy the language directory to tmp
+cp -r langs /tmp/langs
+
+# Run the compatibility check script
+chmod +x /tmp/compatchk.sh
+/tmp/compatchk.sh "$@" --arm64
+if [[ $? -ne 0 ]]; then
     exit 1
 fi
-echo -e "${GREEN}The system kernel is Darwin.${NC}"
 
-if [[ -z "$SKIP_VERSION_CHECK" ]]; then
-    # Check Kernel Version
-    if [[ "$OSTYPE" != "darwin23"* ]]; then
-        echo -e "${RED}Error: The script cannot be executed. (Kernel version mismatch)${NC}"
-        echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}The system kernel version is 23.x.${NC}"
-
-    # Check Production Version  
-    OSVER=$(sw_vers -productVersion)
-    if [[ -z "$(echo "$OSVER" | grep "14.")" ]]; then
-        echo -e "${RED}Error: The script cannot be executed. (Production version mismatch)${NC}"
-        echo -e "${RED}Please run on macOS 14.0 Developer Beta 1 or later.${NC}"
-        exit 1
-    fi
-    echo -e "${GREEN}The system production version is 14.x.${NC}"
-else
-    echo -e "${YELLOW}Skipping version check.${NC}"
-fi
-
-# Check Architecture
-if [[ "$(arch)" != "arm64" ]]; then
-    echo -e "${RED}Error: The script cannot be executed. (CPU architecture mismatch)${NC}"
-    echo -e "${RED}Please run on a Mac with Apple Silicon chip.${NC}"
-    exit 1
-fi
-echo -e "${GREEN}The system CPU architecture is arm64.${NC}"
-echo "System compatibility check is completed."
-
-echo "Checking access to the status file."
+echo "$FS_CHECK"
 if [[ "$*" == *--reinstall* ]]; then
-    echo "Reinstall option has been detected. Deleting the status file."
+    echo "$REINSTALL_DETECTED"
     rm -f "$PROGRESS_FILE"
 fi
 if [[ ! -f "$PROGRESS_FILE" ]]; then
-    echo "The status file does not exist. Creating a new one."
+    echo "$NO_STATUS_FILE"
     echo "done:rosetta" > "$PROGRESS_FILE" 2>/dev/null
 fi
 if [[ ! -f "$PROGRESS_FILE" ]]; then
-    echo -e "${RED}Error: Unable to access the status file.${NC}"
-    echo -e "${RED}Status file path: $PROGRESS_FILE${NC}"
-    echo -e "${RED}Delete the status file and try again.${NC}"
+    echo -e "${RED}$ERROR_STATUS_FILE_ACCESS${NC}"
+    echo -e "${RED}$STAT_FILE_PATH $PROGRESS_FILE${NC}"
+    echo -e "${RED}$RETRY_AFTER_DELETE${NC}"
     exit 1
 fi
-echo -e "${GREEN}Access to the status file is possible.${NC}"
+echo -e "${GREEN}$ACCESSIBLE_STATUS_FILE${NC}"
 
-echo "Starting the preparation stage for D3D12 emulation environment resource..."
-# Start Rosetta2 Installation
+echo "$D3D12_EMU_RS_READY"
+
+# 로제타2 설치 시작
 ROSETTA=$(/usr/bin/pgrep -q oahd && echo Yes || echo No)
 if [[ "$ROSETTA" == "No" ]] && [[ "$*" != *--skip-rosetta* ]]; then
-    echo "Rosetta 2 is not installed."
-    echo "Starting Rosetta 2 installation step..."
+    echo "$ROSETTA_NOT_INSTALLED"
+    echo "$ROSETTA_INSTALL_START"
     softwareupdate --install-rosetta --agree-to-license
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}Failed to install Rosetta 2.${NC}"
-        echo "To skip the Rosetta 2 installation, run this script as follows."
-        echo "./main-kr.sh --skip-rosetta"
+        echo -e "${RED}$ROSETTA_INSTALL_FAILED${NC}"
+        echo "$ROSETTA_SKIP_NOTIFY"
+        echo "$ROSETTA_SKIP_COMMAND"
         exit 1
     fi
-    echo -e "Recording the progress step to the file system..."
+    echo -e "$STATUS_RECORDED"
     echo "done:rosetta" > "$PROGRESS_FILE"
-    echo -e "${GREEN}Rosetta 2 installation is complete.${NC}"
-    echo -e "${GREEN}The DX12 installation preparation step is complete.${NC}"
-    echo "Please restart the script."
+    echo -e "${GREEN}$ROSETTA_INSTALL_DONE${NC}"
+    echo -e "${GREEN}$DX12INSTALL_READY${NC}"
+    echo "$RESTART_SCRIPT"
     exit 0
 fi
 
 VALUE=$(cat "$PROGRESS_FILE")
 
-# File Download Check
+# 파일 다운로드 확인
 if [[ "$VALUE" == "done:rosetta" ]]; then
     echo ""
-    echo "Please download the necessary files from the following link."
-    echo "https://developer.apple.com/download/all/"
-    echo "You can log in using a general Apple account."
-    echo "Files to download:"
+    echo "$DOWNLOAD_FILE"
+    echo "$DOWNLOAD_URL"
+    echo "$DOWNLOAD_FILE_AFTER_LOGIN"
+    echo "$DOWNLOAD_LIST"
     echo " - Command Line Tools for Xcode 15 beta"
     echo " - Game porting toolkit beta"
     echo ""
-    echo "Please save the files in the Downloads folder without changing the file names."
-    echo "Once the download is complete, press the Enter key to proceed with the installation."
+    echo "$DOWNLOAD_SAVE_WITHOUT_NAMEMOD"
+    echo "$DOWNLOAD_THEN_PRESS_ENTER"
     read -r
     if [[ -f ~/"$XCODE_CMDL_PATH" ]]; then
-        echo -e "${GREEN}Xcode Command Line Tools have been verified.${NC}"
+        echo -e "${GREEN}$XCODE_CONFIRMED${NC}"
     else
-        echo -e "${RED}Cannot find Xcode Command Line Tools.${NC}"
-        echo "Please download it from https://developer.apple.com/download/all/ and rerun this script."
+        echo -e "${RED}$XCODE_NOT_FOUND${NC}"
+        echo "$DOWNLOAD_AGAIN_THEN_RESTART"
         exit 1
     fi
     if [[ -f ~/"$TOOLKIT_PATH" ]]; then
-        echo -e "${GREEN}Game Porting Toolkit has been verified.${NC}"
+        echo -e "${GREEN}$GAME_PORTING_TOOLKIT_CONFIRMED${NC}"
     else
-        echo -e "${RED}Cannot find Game Porting Toolkit.${NC}"
-        echo "Please download it from https://developer.apple.com/download/all/ and rerun this script."
+        echo -e "${RED}$GAME_PORTING_TOOLKIT_NOT_FOUND${NC}"
+        echo "$DOWNLOAD_AGAIN_THEN_RESTART"
         exit 1
     fi
-    echo "Recording the progress step to the file system..."
+    echo "$STATUS_RECORDED"
     echo "done:download-files" > "$PROGRESS_FILE"
 fi
 
-# Mount Xcode Command Line Image
+# Xcode 커맨드 라인 이미지 마운트
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:download-files" ]]; then
-    echo "Creating the image file mount point..."
+    echo "$IMAGE_MOUNTPOINT_GENERATE"
     mkdir -p "$XCODE_CMDL_MOUNT_POINT"
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}Cannot create the image file mount point.${NC}"
+        echo -e "${RED}$IMAGE_MOUNTPOINT_GENERATE_FAILED${NC}"
         exit 1
     fi
-    echo "Mounting the image file..."
+    echo "$IMAGE_MOUNTING"
     hdiutil attach ~/"$XCODE_CMDL_PATH" -mountpoint "$XCODE_CMDL_MOUNT_POINT" -quiet
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}Cannot mount Xcode Command Line Tools.${NC}"
+        echo -e "${RED}$XCODE_IMAGE_MOUNT_FAILED${NC}"
         exit 1
     fi
-    echo -e "${GREEN}The Xcode Command Line image mounting step is complete.${NC}"
-    echo "Recording the progress step to the file system..."
+    echo -e "${GREEN}$XCODE_IMAGE_MOUNT_SUCCESS${NC}"
+    echo "$STATUS_RECORDED"
     echo "done:mount-xcode" > "$PROGRESS_FILE"
 fi
 
-# Install Xcode Command Line
+# Xcode 커맨드 라인 설치
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:mount-xcode" ]]; then
-    echo "Starting the installation of Xcode Command Line Tools..."
-    echo "This operation requires an administrator password. The password is not displayed when you enter it."
+    echo "$XCODE_INSTALL_START"
+    echo "$SUDO_REQUIRED"
     sudo installer -pkg "$XCODE_CMDL_MOUNT_POINT"/"Command Line Tools.pkg" -target /
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}Failed to install Xcode Command Line Tools.${NC}"
+        echo -e "${RED}$XCODE_INSTALL_FAILED${NC}"
         exit 1
     fi
-    echo -e "${GREEN}Xcode Command Line Tools installation is complete.${NC}"
-    echo "Unmounting Xcode Command Line Tools..."
+    echo -e "${GREEN}$XCODE_INSTALL_DONE${NC}"
+    echo "$XCODE_DISMOUNT_START"
     hdiutil detach "$XCODE_CMDL_MOUNT_POINT" -quiet
     if [[ $? -ne 0 ]]; then
-        echo -e "${YELLOW}Failed to unmount Xcode Command Line Tools.${NC}"
+        echo -e "${YELLOW}$XCODE_DISMOUNT_FAILED${NC}"
     fi
-    echo "Recording the progress step to the file system..."
+    echo "$STATUS_RECORDED"
     echo "done:unmount-xcode" > "$PROGRESS_FILE"
 fi
 
-# Run auxiliary script
-# The auxiliary script is run in the x86_64 environment
-# x86 version Homebrew installation process
+# 보조 스크립트 실행
+# 보조 스크립트는 x86_64 환경에서 실행됨
+# x86 버전 홈브루 설치 과정
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:unmount-xcode" ]]; then
-    echo "Preparing to run the auxiliary script..."
-    echo "Copying resources..."
-    cp -r "$(dirname "$0")"/subsh"$TOOLKIT_MOUNT_POINT"/x86env_install.sh /tmp/
-    echo "Executing the auxiliary script in x86_64 environment shell..."
-    arch -x86_64 /tmp/x86env_install.sh
+    echo "$SUBSCRIPT_EXEC_PREP"
+    echo "$SUBSCRIPT_EXEC_PREP_RSCOPY"
+    cp -r "$(dirname "$0")"/subsh/x86env_install.sh /tmp/
+    echo "$SUBSCRIPT_IN_X8664"
+    arch -x86_64 /tmp/x86env_install.sh "$@"
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}Failed to run the x86_64 auxiliary script.${NC}"
+        echo -e "${RED}$SUBSCRIPT_FAILED${NC}"
         exit 1
     fi
-    echo -e "${GREEN}Completed running the x86_64 auxiliary script.${NC}"
-    echo "Recording the progress stage in the filesystem..."
+    echo -e "${GREEN}$SUBSCRIPT_DONE${NC}"
+    echo "$STATUS_RECORDED"
     echo "done:subshell-x86env" > "$PROGRESS_FILE"
 fi
 
-# Wine Prefix setup
+# Wine Prefix 설정
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:subshell-x86env" ]]; then
-    echo "Setting up Wine Prefix..."
-    echo -e "${YELLOW}Please follow the Wine Prefix setup guide.${NC}"
-    echo "Please select the Windows 10 version in the Wine Prefix creation window."
-    echo "You can choose the version through the dropdown menu in the lower right corner of the creation window, Windows Version. (Default: Windows 7, change to Windows 10)"
-    echo "After that, click the Apply button and then press the OK button to close the window."
-    echo "Press the return key to continue. (All Wine and Wine servers will be terminated when proceeding!)"
+    echo "$WINE_PREFIX_SETTING"
+    echo -e "${YELLOW}$WINE_PREFIX_SETTING_INSTRUCTION_FOLLOW${NC}"
+    echo "$WINE_PREFIX_SETTING_INSTRUCTION"
     read
-    echo "Ending the Wine64 preloader..."
+    echo "$WINE_PREFIX_QUIT_PRELOADER"
     if [[ $(pgrep -x wine64-preloader) ]]; then
         killall wine64-preloader
     fi
-    echo "Ending the Wine64 server..."
+    echo "$WINE_PREFIX_QUIT_SERVER"
     if [[ $(pgrep -x wineserver) ]]; then
         killall wineserver
     fi
-    echo "The Wine Prefix creation window will open shortly..."
+    echo "$WINE_PREFIX_WINDOW_OPEN"
     arch -x86_64 /bin/bash -c 'eval "$(/usr/local/bin/brew shellenv)"; WINEPREFIX=~/WindowsPrefix `brew --prefix game-porting-toolkit`/bin/wine64 winecfg'
-    echo -e "${GREEN}Wine Prefix setup stage is completed.${NC}"
-    echo "Recording the progress stage in the filesystem..."   
+    echo -e "${GREEN}$WINE_PREFIX_SETTING_DONE${NC}"
+    echo "$STATUS_RECORDED"   
     echo "done:wine-prefix" > "$PROGRESS_FILE"
 fi
 
-# Game Port Toolkit image mount
+# Game Port Toolkit 이미지 마운트
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:wine-prefix" ]]; then
-    echo "Starting the Game Port Toolkit image mount stage..."
-    echo "Creating the image file mount point..."
+    echo "$GPT_IMAGE_MOUNT_STAGE"
+    echo "$GPT_IMAGE_MOUNT_CREATE"
     mkdir -p "$TOOLKIT_MOUNT_POINT"
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}Unable to create the image file mount point.${NC}"
+        echo -e "${RED}$GPT_IMAGE_MOUNT_CREATE_FAILED${NC}"
         exit 1
     fi
-    echo "Mounting the image file..."
+    echo "$GPT_IMAGE_MOUNT"
     hdiutil attach ~/"$TOOLKIT_PATH" -mountpoint "$TOOLKIT_MOUNT_POINT"
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}Unable to mount the Game Porting Toolkit.${NC}"
+        echo -e "${RED}$GPT_IMAGE_MOUNT_FAILED${NC}"
         exit 1
     fi
-    echo -e "${GREEN}Completed the Game Porting Toolkit image mount stage.${NC}"
-    echo "Recording the progress stage in the filesystem..."
-    echo "done:mount-gameport" >
-
- "$PROGRESS_FILE"
+    echo -e "${GREEN}$GPT_IMAGE_MOUNT_DONE${NC}"
+    echo "$STATUS_RECORDED"
+    echo "done:mount-gameport" > "$PROGRESS_FILE"
 fi
 
-# Execute Ditto
-# Run in x86 version
+# Ditto 실행
+# x86 버전에서 실행됨
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:mount-gameport" ]]; then
-    echo "Starting the Ditto operation stage..."
-    echo "Copying the Ditto auxiliary script..."
-    cp -r "$(dirname "$0")"/subsh/en/x86env_ditto.sh /tmp/
-    echo "Running the Ditto auxiliary script in the x86_64 environment shell..."
-    arch -x86_64 /tmp/x86env_ditto.sh "$TOOLKIT_MOUNT_POINT"
+    echo "$DITTO_STAGE"
+    echo "$DITTO_HELPER_SCRIPT_COPY"
+    cp -r "$(dirname "$0")"/subsh/x86env_ditto.sh /tmp/
+    echo "$DITTO_HELPER_IN_8664"
+    arch -x86_64 /tmp/x86env_ditto.sh "$TOOLKIT_MOUNT_POINT" "$@"
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}Failed to run the x86_64 Ditto auxiliary script.${NC}"
+        echo -e "${RED}$DITTO_HELPER_FAILED${NC}"
         exit 1
     fi
-    echo -e "${GREEN}Completed running the x86_64 Ditto auxiliary script.${NC}"
-    echo "Recording the progress stage in the filesystem..."
+    echo -e "${GREEN}$DITTO_HELPER_DONE${NC}"
+    echo "$STATUS_RECORDED"
     echo "done:ditto" > "$PROGRESS_FILE"
 fi
 
-# Copy Toolkit commands
+# Toolkit 명령어 복사
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:ditto" ]]; then
-    echo "Starting the Toolkit command copy stage..."
-    echo "Copying the Toolkit commands..."
+    echo "$TOOLKIT_COPY_STAGE"
+    echo "$TOOLKIT_COPY"
     cp -vr "$TOOLKIT_MOUNT_POINT"/gameportingtoolkit* /usr/local/bin/
     if [[ $? -ne 0 ]]; then
-        echo -e "${RED}Failed to copy the Toolkit commands.${NC}"
+        echo -e "${RED}$TOOLKIT_COPY_FAILED${NC}"
         exit 1
     fi
-    echo -e "${GREEN}Completed the Toolkit command copy stage.${NC}"
-    echo "Recording the progress stage in the filesystem..."
+    echo -e "${GREEN}$TOOLKIT_COPY_DONE${NC}"
+    echo "$STATUS_RECORDED"
     echo "done:copy-toolkit" > "$PROGRESS_FILE"
 fi
 
-# Unmount Toolkit image
+# Toolkit 이미지 마운트 해제
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:copy-toolkit" ]]; then
-    echo "Starting the Toolkit image unmount stage..."
-    echo "Unmounting the Toolkit image..."
+    echo "$TOOLKIT_DISMOUNT_STAGE"
+    echo "$TOOLKIT_DISMOUNT"
     hdiutil detach "$TOOLKIT_MOUNT_POINT" -quiet
     if [[ $? -ne 0 ]]; then
-        echo -e "${YELLOW}Failed to unmount the Toolkit image.${NC}"
+        echo -e "${YELLOW}$TOOLKIT_DISMOUNT_FAILED${NC}"
     fi
-    echo -e "${GREEN}Completed the Toolkit image unmount stage.${NC}"
-    echo "Recording the progress stage in the filesystem..."
+    echo -e "${GREEN}$TOOLKIT_DISMOUNT_DONE${NC}"
+    echo "$STATUS_RECORDED"
     echo "done:unmount-gameport" > "$PROGRESS_FILE"
 fi
 
-# Delete Toolkit image
-# Automatically delete with the --cleanup option
+# Toolkit 이미지 삭제
+# --cleanup 옵션을 사용하면 자동 삭제
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:unmount-gameport" ]]; then
-    echo "Would you like to delete the Toolkit image? (y/n)"
+    echo "$TOOLKIT_DELETION_CONFIMATION"
     if [[ "$*" == *--cleanup* ]]; then
-        echo "Automatic cleanup option is enabled."
+        echo "$TOOLKIT_DELETION_ENABLED"
         DELETE="y"
     else
         read DELETE
     fi
     if [[ "$DELETE" == "y" ]]; then
-        echo "Deleting the Toolkit image..."
+        echo "$TOOLKIT_DELETION"
         rm -rf ~/"$TOOLKIT_PATH"
         if [[ $? -ne 0 ]]; then
-            echo -e "${YELLOW}Failed to delete the Toolkit image.${NC}"
+            echo -e "${YELLOW}$TOOLKIT_DELETION_FAILED${NC}"
         fi
-        echo -e "${GREEN}Completed the Toolkit image deletion stage.${NC}"
+        echo -e "${GREEN}$TOOLKIT_DELETION_DONE${NC}"
     else
-        echo -e "${YELLOW}Skipping the Toolkit image deletion stage.${NC}"
+        echo -e "${YELLOW}$TOOLKIT_DELETION_SKIP${NC}"
     fi
-    echo "Recording the progress stage in the filesystem..."
+    echo "$STATUS_RECORDED"
     echo "done:delete-gameport" > "$PROGRESS_FILE"
 fi
 
-# Delete Xcode Command Line image
-# Automatically delete with the --cleanup option
+# Xcode Command Line 이미지 삭제
+# --cleanup 옵션을 사용하면 자동 삭제
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:delete-gameport" ]]; then
-    echo "Would you like to delete the Xcode Command Line image? (y/n)"
+    echo "$XCODE_IMG_DELETION_CONFIRMATION"
     if [[ "$*" == *--cleanup* ]]; then
-        echo "Automatic cleanup option is enabled."
+        echo "$XCODE_IMG_DELETION_ENABLED"
         DELETE="y"
     else
         read DELETE
     fi
     if [[ "$DELETE" == "y" ]]; then
-        echo "Deleting the Xcode Command Line image..."
+        echo "$XCODE_IMG_DELETION"
         rm -rf ~/"$XCODE_PATH"
         if [[ $? -ne 0 ]]; then
-            echo -e "${YELLOW}Failed to delete the Xcode Command Line image.${NC}"
+            echo -e "${YELLOW}$XCODE_IMG_DELETION_FAILED${NC}"
         fi
-        echo -e "${GREEN}Completed the Xcode Command Line image deletion stage.${NC}"
+        echo -e "${GREEN}$XCODE_IMG_DELETION_DONE${NC}"
     else
-        echo -e "${YELLOW}Skipping the Xcode Command Line image deletion stage.${NC}"
+        echo -e "${YELLOW}$XCODE_IMG_DELETION_SKIP${NC}"
     fi
-    echo "Recording the progress stage in the filesystem..."
+    echo "$STATUS_RECORDED"
     echo "done:delete-xcode" > "$PROGRESS_FILE"
 fi
 
-# Base structure installation completed
+# 기반 구조 설치 완료
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:delete-xcode" ]]; then
-    echo -e "${GREEN}Completed the base structure installation stage.${NC}"
-    echo "Starting the game service installation stage..."
-    echo "Please select from the following options."
-    echo -e "1. ${SUPPORTED}Steam${NC}"
-    echo -e "2. ${UNKNOWN}Battle.net [Incomplete]${NC}"
-    echo -e "3. ${UNKNOWN}Epic Games / GOG.com [Incomplete]${NC}"
-    echo "1, 2, 3 >>> "
+    echo -e "${GREEN}$BASE_DONE${NC}"
+    echo "$GAMESERVICE_INSTALL_STAGE"
+    echo "$GAMESERVICE_CHOOSE_FROM_LIST"
+    echo -e "1. ${SUPPORTED}$STEAM${NC}"
+    echo -e "2. ${UNKNOWN}$BATTLENET${NC}"
+    echo -e "3. ${UNKNOWN}$OTHERS${NC}"
+    echo "$SELECTION_PROMPT"
     read GAME_INSTALLER
     if [[ "$GAME_INSTALLER" == "1" ]]; then
-        echo "Starting the Steam installation subshell..."
-        echo "Copying the Steam installation script..."
-        cp -r "$(dirname "$0")"/subsh/en/x86env_steaminst.sh /tmp/
+        echo "$STEAM_INSTALL_SUBSHELL_START"
+        echo "$STEAM_INSTALL_SUBSHELL_COPY"
+        cp -r "$(dirname "$0")"/subsh/x86env_steaminst.sh /tmp/
         cp -r "$(dirname "$0")"/subsh/wrappers /tmp/
-        echo "Running the Steam installation script in the x86_64 environment shell..."
-        arch -x86_64 /tmp/x86env_steaminst.sh
+        echo "$STEAM_INSTALL_SUBSHELL_8664"
+        arch -x86_64 /tmp/x86env_steaminst.sh  "$@"
         if [[ $? -ne 0 ]]; then
-            echo -e "${RED}Failed to run the x86_64 Steam installation script.${NC}"
+            echo -e "${RED}$STEAM_INSTALL_SUBSHELL_FAILED${NC}"
             exit 1
         fi
-        echo -e "${GREEN}Completed running the x86_64 Steam installation script.${NC}"
-        echo "This stage is not recorded in the filesystem."
+        echo -e "${GREEN}$STEAM_INSTALL_SUBSHELL_DONE${NC}"
+        echo "$NOT_RECORDED_ON_FS"
     elif [[ "$GAME_INSTALLER" == "2" ]]; then
-        echo "Starting the Battle.net installation subshell..."
-        echo "Copying the Battle.net installation script..."
-        cp -r "$(dirname "$0")"/subsh/en/x86env_battlenetinst.sh /tmp/
+        echo "$BATTLENET_INSTALL_SUBSHELL_START"
+        echo "$BATTLENET_INSTALL_SUBSHELL_COPY"
+        cp -r "$(dirname "$0")"/subsh/x86env_battlenetinst.sh /tmp/
         cp -r "$(dirname "$0")"/subsh/wrappers /tmp/
-        echo "Running the Battle.net installation script in the x86_64 environment shell..."
-        arch -x86_64 /tmp/x86env_battlenetinst.sh
+        echo "$BATTLENET_INSTALL_SUBSHELL_8664"
+        arch -x86_64 /tmp/x86env_battlenetinst.sh "$@"
         if [[ $? -ne 0 ]]; then
-            echo -e "${RED}Failed to run the x86_64 Battle.net installation script.${NC}"
+            echo -e "${RED}$BATTLENET_INSTALL_SUBSHELL_FAILED${NC}"
             exit 1
         fi
-        echo -e "${GREEN}Completed running the x86_64 Battle.net installation script.${NC}"
-        echo "This stage is not recorded in the filesystem."
+        echo -e "${GREEN}$BATTLENET_INSTALL_SUBSHELL_DONE${NC}"
+        echo "$NOT_RECORDED_ON_FS"
     elif [[ "$GAME_INSTALLER" == "3" ]]; then
-        echo "Starting the Epic Games / GOG.com installation subshell..."
-        echo "Copying the Epic Games / GOG.com installation script..."
-        cp -r "$(dirname "$0")"/subsh/en/x86env_epicgoginst.sh /tmp/
+        echo "$OTHERS_INSTALL_SUBSHELL_START"
+        echo "$OTHERS_INSTALL_SUBSHELL_COPY"
+        cp -r "$(dirname "$0")"/subsh/x86env_epicgoginst.sh /tmp/
         cp -r "$(dirname "$0")"/subsh/wrappers /tmp/
-        echo "Running the Epic Games / GOG.com installation script in the x86_64 environment shell..."
-        arch -x86_64 /tmp/x86env_epicgoginst.sh
+        echo "$OTHERS_INSTALL_SUBSHELL_8664"
+        arch -x86_64 /tmp/x86env_epicgoginst.sh "$@"
         if [[ $? -ne 0 ]]; then
-            echo -e "${RED}Failed to run the x86_64 Epic Games / GOG.com installation script.${NC}"
+            echo -e "${RED}$OTHERS_INSTALL_SUBSHELL_FAILED${NC}"
             exit 1
         fi
-        echo -e "${GREEN}Completed running the x86_64 Epic Games / GOG.com installation script.${NC}"
-        echo "This stage is not recorded in the filesystem."
+        echo -e "${GREEN}$OTHERS_INSTALL_SUBSHELL_DONE${NC}"
+        echo "$NOT_RECORDED_ON_FS"
     else
-        echo -e "${RED}Invalid selection.${NC}"
+        echo -e "${RED}$SELECTION_INVALID${NC}"
         exit 1
     fi
-    echo "Completed the game service installation stage."
+    echo "$NOT_RECORDED_ON_FS"
 fi
 
-echo "All stages are completed. Exiting the script."
+echo "$DONE"
 exit 0
