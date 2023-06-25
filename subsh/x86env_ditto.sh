@@ -1,9 +1,8 @@
 #!/bin/bash
 
+source langs/en.env
 if [[ "$*" == *--kr* ]]; then
     source langs/kr.env
-else
-    source langs/en.env
 fi
 
 echo "$DITTO_STAGE_START"

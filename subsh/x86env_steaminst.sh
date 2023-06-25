@@ -3,10 +3,9 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 NC='\033[0m'
 
+source langs/steaminst/en.env
 if [[ "$*" == *--kr* ]]; then
     source langs/steaminst/kr.env
-else
-    source langs/steaminst/en.env
 fi
 
 echo "$STEAM_INSATLL_STAGE"

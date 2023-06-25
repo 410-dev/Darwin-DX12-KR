@@ -15,10 +15,9 @@ TOOLKIT_MOUNT_POINT="/tmp/d3d12_toolkit"
 XCODE_CMDL_PATH="Downloads/Command_Line_Tools_for_Xcode_15_beta.dmg"
 XCODE_CMDL_MOUNT_POINT="/tmp/d3d12_xcode"
 
+source langs/en.env
 if [[ "$*" == *--kr* ]]; then
     source langs/kr.env
-else
-    source langs/en.env
 fi
 
 echo "#######Script Release#######"
@@ -26,6 +25,15 @@ echo "Script Written: 2023-June-09 EDT"
 echo "Script Updated: 2023-June-24 EDT"
 echo "Tested on: macOS 14.0 Developer Beta 2"
 echo "############################"
+echo ""
+echo "#######Disclaimer / 경고#######"
+echo "This script is written by 410-dev, and is not affiliated with Apple Inc. or any other company."
+echo "This script will allow you to run some Windows games on macOS, but it is not guaranteed to work on all games and performance."
+echo "This script is provided as-is, and the author is not responsible for any damage caused by this script."
+echo "이 스크립트는 410-dev가 작성한 것으로, Apple Inc. 나 다른 회사와 관련이 없습니다."
+echo "이 스크립트는 macOS에서 일부 Windows 게임을 실행할 수 있게 해주지만, 모든 게임에서 작동 여부 및 성능을 보장하지는 않습니다."
+echo "이 스크립트는 그대로 제공되며, 작성자는 이 스크립트로 인해 발생하는 모든 손해에 대해 책임지지 않습니다."
+echo "##############################"
 echo ""
 echo "$SCRIPT_DOC_INFO"
 echo "https://www.applegamingwiki.com/wiki/Game_Porting_Toolkit"
@@ -277,7 +285,7 @@ fi
 # --cleanup 옵션을 사용하면 자동 삭제
 VALUE=$(cat "$PROGRESS_FILE")
 if [[ "$VALUE" == "done:unmount-gameport" ]]; then
-    echo "$TOOLKIT_DELETION_CONFIMATION"
+    echo "$TOOLKIT_DELETION_CONFIRMATION"
     if [[ "$*" == *--cleanup* ]]; then
         echo "$TOOLKIT_DELETION_ENABLED"
         DELETE="y"
@@ -286,7 +294,7 @@ if [[ "$VALUE" == "done:unmount-gameport" ]]; then
     fi
     if [[ "$DELETE" == "y" ]]; then
         echo "$TOOLKIT_DELETION"
-        rm -rf ~/"$TOOLKIT_PATH"
+        rm -v ~/"$TOOLKIT_PATH"
         if [[ $? -ne 0 ]]; then
             echo -e "${YELLOW}$TOOLKIT_DELETION_FAILED${NC}"
         fi
@@ -311,7 +319,7 @@ if [[ "$VALUE" == "done:delete-gameport" ]]; then
     fi
     if [[ "$DELETE" == "y" ]]; then
         echo "$XCODE_IMG_DELETION"
-        rm -rf ~/"$XCODE_PATH"
+        rm -v ~/"$XCODE_CMDL_PATH"
         if [[ $? -ne 0 ]]; then
             echo -e "${YELLOW}$XCODE_IMG_DELETION_FAILED${NC}"
         fi
