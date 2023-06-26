@@ -339,8 +339,9 @@ if [[ "$VALUE" == "done:delete-xcode" ]]; then
     echo "$GAMESERVICE_CHOOSE_FROM_LIST"
     echo -e "1. ${SUPPORTED}$STEAM${NC}"
     echo -e "2. ${SUPPORTED}$BATTLENET${NC}"
-    echo -e "3. ${UNKNOWN}$OTHERS${NC}"
-    echo "$SELECTION_PROMPT"
+    echo -e "3. ${UNSUPPORTED}$OTHERS${NC}"
+    echo -e "0. $EXIT_PROMPT"
+    echo -n "$SELECTION_PROMPT"
     read GAME_INSTALLER
     if [[ "$GAME_INSTALLER" == "1" ]]; then
         echo "$STEAM_INSTALL_SUBSHELL_START"
@@ -381,6 +382,8 @@ if [[ "$VALUE" == "done:delete-xcode" ]]; then
         fi
         echo -e "${GREEN}$OTHERS_INSTALL_SUBSHELL_DONE${NC}"
         echo "$NOT_RECORDED_ON_FS"
+    elif [[ "$GAME_INSTALLER" == "0" ]]; then
+        exit 0
     else
         echo -e "${RED}$SELECTION_INVALID${NC}"
         exit 1
