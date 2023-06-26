@@ -13,7 +13,7 @@ This script is about 90% automated, and the rest requires direct mouse operation
 ⚠️: Working in progress / Not tested
 ❌: Not supported
 - [✅] Steam
-- [⚠️] [W.I.P] Battle.net
+- [⚠️] [W.I.P] Battle.net (Login OAuth not working)
 - [⚠️] [W.I.P] Epic Games
 - [⚠️] [W.I.P] GOG.com
 

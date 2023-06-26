@@ -68,6 +68,6 @@ done
 echo -e "${GREEN}$STEAM_LOGIN_DONE${NC}"
 echo "$STEAM_APP_INSTALL"
 xattr -c "$(dirname "$0")/wrappers/Steam for Windows.app"
-cp -R "$(dirname "$0")/wrappers/Steam for Windows.app" "/Applications/"
+cp -R "$(dirname "$0")/wrappers/Steam for Windows.app" ~/Applications/
 echo "$SCRIPT_EXIT"
 exit 0
