@@ -19,7 +19,7 @@ This script is about 90% automated, and the rest requires direct mouse operation
 
 ### How to use (without git)
 
-Download the [d3d12script.tar.gz](https://github.com/410-dev/Darwin-DirectX12/releases/download/0.0.3/d3d12script.tar.gz) file from [this link (releases page)](https://github.com/410-dev/Darwin-DirectX12/releases), and extract it.
+Download the [d3d12script.tar.gz](https://github.com/410-dev/Darwin-DirectX12/releases/download/0.0.4/d3d12script.tar.gz) file from [this link (releases page)](https://github.com/410-dev/Darwin-DirectX12/releases), and extract it.
 
 Open the terminal and enter the following command. At this point, please replace <unzipped folder name> with the name of your unzipped folder.
 
@@ -74,7 +74,7 @@ Then follow the instructions of the script.
 
 ### 사용 방법 (git 사용 없이)
 
-[이 링크](https://github.com/410-dev/Darwin-DirectX12/releases) 에서 [d3d12script.tar.gz](https://github.com/410-dev/Darwin-DirectX12/releases/download/0.0.3/d3d12script.tar.gz) 파일을 다운로드 받고, 압축을 해제합니다.
+[이 링크](https://github.com/410-dev/Darwin-DirectX12/releases) 에서 [d3d12script.tar.gz](https://github.com/410-dev/Darwin-DirectX12/releases/download/0.0.4/d3d12script.tar.gz) 파일을 다운로드 받고, 압축을 해제합니다.
 
 터미널을 열고 다음 명령어를 입력합니다. 이 때, <압축 해제된 폴더 이름> 은 압축 해제된 폴더 이름으로 바꾸어주세요.
 
