@@ -338,7 +338,7 @@ if [[ "$VALUE" == "done:delete-xcode" ]]; then
     echo "$GAMESERVICE_INSTALL_STAGE"
     echo "$GAMESERVICE_CHOOSE_FROM_LIST"
     echo -e "1. ${SUPPORTED}$STEAM${NC}"
-    echo -e "2. ${UNKNOWN}$BATTLENET${NC}"
+    echo -e "2. ${SUPPORTED}$BATTLENET${NC}"
     echo -e "3. ${UNKNOWN}$OTHERS${NC}"
     echo "$SELECTION_PROMPT"
     read GAME_INSTALLER
