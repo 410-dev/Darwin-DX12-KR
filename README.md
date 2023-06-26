@@ -13,7 +13,7 @@ This script is about 90% automated, and the rest requires direct mouse operation
 ⚠️: Working in progress / Not tested
 ❌: Not supported
 - [✅] Steam
-- [✅] [W.I.P] Battle.net (Login OAuth not working)
+- [✅] [Utility W.I.P] Battle.net (Login OAuth not working)
 - [⚠️] [W.I.P] Epic Games
 - [⚠️] [W.I.P] GOG.com
 
@@ -68,7 +68,7 @@ Then follow the instructions of the script.
 ⚠️: 작업중 / 테스트 안됨
 ❌: 지원 안됨
 - [✅] Steam
-- [✅] [작업중] Battle.net
+- [✅] [유틸리티 작업중] Battle.net
 - [⚠️] [작업중] Epic Games
 - [⚠️] [작업중] GOG.com
 
